@@ -2,9 +2,15 @@ const { validationResult } = require("express-validator");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const errorFormatter = require("../utils/errorFormatter");
+const jwt = require("jsonwebtoken");
 
 exports.signupGetController = async (req, res, next) => {};
+
+
+
 exports.signupPostController = async (req, res, next) => {
+
+  
   const error = validationResult(req).formatWith(errorFormatter);
   if (!error.isEmpty()) {
     let err = error.mapped();
@@ -25,10 +31,17 @@ exports.signupPostController = async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+
+
+
+
+
 };
 exports.loginGetController = (req, res, next) => {};
 
 exports.loginPostCotroller = async (req, res, next) => {
+
+  
   const { email, password } = req.body;
   const error = validationResult(req).formatWith(errorFormatter);
   if (!error.isEmpty()) {
@@ -48,11 +61,25 @@ exports.loginPostCotroller = async (req, res, next) => {
       res.json({
         message: "Password is incorrect",
       });
-    } else {
-      res.send(user);
     }
+
+    const payload = {
+      id: user._id,
+      email: user.eail,
+    };
+
+    const token = jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: "2d",
+    });
+    return res.send({
+      user: user,
+      token:"Bearer " + token,
+    });
   } catch (error) {
     console.log(error);
   }
 };
+
+
+
 exports.logoutController = (req, res, next) => {};
